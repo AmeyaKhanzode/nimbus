@@ -1,8 +1,9 @@
 import requests
 try:
-    with open("Ameya_Resme_SDE.pdf", "rb") as f:
-        files = {"file": ("Ameya_Resume_SDE.pdf", f, "application/pdf")}
-        response = requests.post("http://127.0.0.1:8000/upload", files=files)
+    filename = "test.txt"
+    with open(filename, "rb") as f:
+        files = {"file": (filename, f, "application/pdf")}
+        response = requests.post("http://192.168.1.100:8000/upload", files=files)
 
     print(response.json())
 except FileNotFoundError:
