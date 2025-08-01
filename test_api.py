@@ -1,26 +1,34 @@
 import requests
 import os
-# try:
-#     filename = "test.txt"
-#     with open(filename, "rb") as f:
-#         files = {"file": (filename, f, "text/plain")}
-#         response = requests.post("http://192.168.1.100:8000/upload", files=files)
+import argparse
 
-#     print(response.json())
-# except FileNotFoundError:
-#     print({"status": "File not found on client", "status_code": 404})
+def upload(filename):
+    try:
+        with open(filename, "rb") as f:
+            files = {"file": (filename, f, "text/plain")}
+            response = requests.post("http://192.168.1.100:8000/upload", files=files)
 
-filename = "test.txt"
-params = {"filename": filename}
-response = requests.get("http://192.168.1.100:8000/download", params=params)
+        print(response.json())
+        print(f"{filename} uploaded to cloud.")
+    except FileNotFoundError:
+        print({"status": "File not found on client", "status_code": 404})
 
-print("Download response status:", response.status_code)
-print("Download response headers:", response.headers)
-print("Download response content (first 200 bytes):", response.content[:200])
-print("Raw downloaded bytes:", response.content[:100])
+def download(filename):
+    params = {"filename": filename}
+    response = requests.get("http://192.168.1.100:8000/download", params=params)
 
+    if response.status_code == 200:
+        os.makedirs("cloudbox_downloads", exist_ok=True)
+        with open(f"cloudbox_downloads/{filename}", "wb") as f:
+            f.write(response.content)
+    print(f"{filename} downloaded from cloud and saved to cloudbox_downloads.")
 
-if response.status_code == 200:
-    os.makedirs("cloudbox_downloads", exist_ok=True)
-    with open(f"cloudbox_downloads/{filename}", "wb") as f:
-        f.write(response.content)
+parser = argparse.ArgumentParser(description="CLI tool for a private cloud on my raspberry pi")
+parser.add_argument("commands", choices=["upload", "download"])
+parser.add_argument("filename")
+
+args = parser.parse_args()
+if (args.commands == "upload"):
+    upload(args.filename)
+elif (args.commands == "download"):
+    download(args.filename)
