@@ -20,7 +20,10 @@ async def upload_files(file: UploadFile = File(...)):
             "filename": file.filename,
             "status": "File uploaded successfully"
         }
-
+'''
+we can store hashes of the content inside the file in the metadata db and then check for the hashes when the file is uploaded
+ and if its already present in the cloud then we dont upload it
+'''
 @app.get("/download")
 async def download_files(filename: str):
     file_path = f"{UPLOADS_DIR}/{filename}"

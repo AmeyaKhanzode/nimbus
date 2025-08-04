@@ -21,3 +21,7 @@
 ## creating a sym link to allow using "cloudbox" as a cli tool
 1. chmod +x /Users/ameyakhanzode/Desktop/New\ Learning/projects/cloud_project/cli.py
 2. sudo ln -s /Users/ameyakhanzode/Desktop/New\ Learning/projects/cloud_project/cli.py /usr/local/bin/cloudbox
+
+## make sure to create a database before using
+1. psql -U your_username
+2. CREATE DATABASE cloudbox;
