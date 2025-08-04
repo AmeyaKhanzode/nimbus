@@ -6,6 +6,13 @@
 - /download
 - /list_uploads
 - /list_trash
-- /delete
-- /restore
-- /status
+- /delete : pending
+- /restore : pending
+- /status : pending
+
+## more pending stuff
+- metadata db
+- user management
+- jwt
+- encryption
+- blockchain
