@@ -17,3 +17,7 @@
 - encryption
 - blockchain
 - chunking
+
+## creating a sym link to allow using "cloudbox" as a cli tool
+1. chmod +x /Users/ameyakhanzode/Desktop/New\ Learning/projects/cloud_project/cli.py
+2. sudo ln -s /Users/ameyakhanzode/Desktop/New\ Learning/projects/cloud_project/cli.py /usr/local/bin/cloudbox
