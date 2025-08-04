@@ -6,7 +6,7 @@ import os
 app = FastAPI()
 
 # Create uploads directory on startup
-UPLOADS_DIR = "/home/cloudbox/uploads"
+UPLOADS_DIR = "/home/ameya/cloudbox/uploads"
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 @app.post("/upload")
 async def upload_files(file: UploadFile = File(...)):
@@ -48,7 +48,7 @@ async def list_uploads():
 
 @app.get("list_trash")
 async def list_trash():
-    files = os.listdir("/home/cloudbox/trash")
+    files = os.listdir("/home/ameya/cloudbox/trash")
     length = len(files)
 
     return {
