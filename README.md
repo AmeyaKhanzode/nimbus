@@ -12,7 +12,6 @@
 
 ## more pending stuff
 - metadata db
-- user management
 - jwt
 - encryption
 - blockchain
