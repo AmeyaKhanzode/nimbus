@@ -4,7 +4,7 @@ import argparse
 import importnb
 
 with importnb.Notebook():
-    import test_api
+    import api_handlers
 
 parser = argparse.ArgumentParser(description="CLI tool for a private cloud on my raspberry pi")
 parser.add_argument("commands", choices=["upload", "download"])
@@ -12,6 +12,6 @@ parser.add_argument("filename")
 
 args = parser.parse_args()
 if (args.commands == "upload"):
-    test_api.upload(args.filename)
+    api_handlers.upload(args.filename)
 elif (args.commands == "download"):
-    test_api.download(args.filename)
+    api_handlers.download(args.filename)
