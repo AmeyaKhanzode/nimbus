@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 import base64
 import os
+import hashlib
 
 app = FastAPI()
 
@@ -11,6 +12,8 @@ os.makedirs(UPLOADS_DIR, exist_ok=True)
 @app.post("/upload")
 async def upload_files(file: UploadFile = File(...)):
     content = await file.read()
+    file_hash = hashlib.sha256(content)
+
     try:
         with open(f"{UPLOADS_DIR}/{file.filename}", "wb") as f:
             f.write(content)
@@ -22,7 +25,7 @@ async def upload_files(file: UploadFile = File(...)):
         }
 '''
 we can store hashes of the content inside the file in the metadata db and then check for the hashes when the file is uploaded
- and if its already present in the cloud then we dont upload it
+and if its already present in the cloud then we dont upload it
 '''
 @app.get("/download")
 async def download_files(filename: str):
@@ -49,7 +52,7 @@ async def list_uploads():
         "message" : f"Found {length} uploaded files"
     }
 
-@app.get("list_trash")
+@app.get("/list_trash")
 async def list_trash():
     files = os.listdir("/home/ameya/cloudbox/trash")
     length = len(files)
