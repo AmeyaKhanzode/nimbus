@@ -16,6 +16,7 @@
 - encryption
 - blockchain
 - chunking
+- resetting password
 
 ## creating a sym link to allow using "cloudbox" as a cli tool
 1. chmod +x /Users/ameyakhanzode/Desktop/New\ Learning/projects/cloud_project/cli.py
