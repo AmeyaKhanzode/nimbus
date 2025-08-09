@@ -9,7 +9,7 @@ with importnb.Notebook():
     import api_handlers
 
 
-if ("user_data.json" not in os.listdir()):
+if api_handlers.check_user_exists():
     if not api_handlers.register_user():
         sys.exit(1)
 else:

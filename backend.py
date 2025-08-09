@@ -1,33 +1,45 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
 from fastapi.responses import FileResponse
 import os
 import hashlib
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 import secrets
-from jose import jwt, JWTError
+from jose import jwt, JWTError, ExpiredSignatureError
 from pydantic import BaseModel
+from datetime import datetime, timedelta
 import json
 
-SECRET_KEY = secrets.token_hex(32)
+SECRET_KEY = os.getenv("SECRET_KEY", secrets.token_hex(32))
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")  # used to securely hash passwords
-
-fake_user = {
-    "username": "ameya",
-    "hashed_password": pwd_context.hash("password123")  # You can change the password
-}
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-def create_access_token(data: dict):
-    return jwt.encode(data, SECRET_KEY, algorithm="HS256")
+def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=30)):
+    to_encode = data.copy()
+    expiry = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expiry})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm="HS256")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # this is a token extractor, tells fastapi that user must provide a jwt to access protected endpoints
 """
 FastAPI, please expect users to send their login form to /token, 
 and once they get a token, they'll use it in the Authorization: Bearer <token> header when calling protected routes.
 """
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        username = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return username
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
 app = FastAPI()
 
 class User(BaseModel):
@@ -45,11 +57,11 @@ async def register_user(user: User):
                 }, f)
         return {"status" : "success", "message" : f"User {user.username} registered successfully"}
     except:
-        return {"status" : "fail", "message" : "Could not register user"}
+        raise HTTPException(status_code=400, detail="Could not register user")
 
 
 @app.post("/token")
-async def login(form_data: OAuth2PasswordRequestForm = None):
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     with open("user_data.json", "r") as f:
         data = json.load(f)
     username = data["username"]
@@ -78,15 +90,15 @@ async def user_exists():
             return {"user_exists": False}
     except Exception:
         return {"user_exists": False}
-    
 
 # Create uploads directory on startup
 UPLOADS_DIR = "/home/ameya/cloudbox/uploads"
 os.makedirs(UPLOADS_DIR, exist_ok=True)
+
 @app.post("/upload")
-async def upload_files(file: UploadFile = File(...)):
+async def upload_files(file: UploadFile = File(...), current_user: str = Depends(get_current_user)):
     content = await file.read()
-    file_hash = hashlib.sha256(content)
+    file_hash = hashlib.sha256(content).hexdigest()
 
     try:
         with open(f"{UPLOADS_DIR}/{file.filename}", "wb") as f:
@@ -102,7 +114,7 @@ we can store hashes of the content inside the file in the metadata db and then c
 and if its already present in the cloud then we dont upload it
 '''
 @app.get("/download")
-async def download_files(filename: str):
+async def download_files(filename: str, current_user: str = Depends(get_current_user)):
     file_path = f"{UPLOADS_DIR}/{filename}"
     print(f"Looking for file: {file_path}")
     print(f"File exists: {os.path.exists(file_path)}")
@@ -116,7 +128,7 @@ async def download_files(filename: str):
     )
 
 @app.get("/list_uploads")
-async def list_uploads():
+async def list_uploads(current_user: str = Depends(get_current_user)):
     files = os.listdir(UPLOADS_DIR)
     length = len(files)
 
@@ -127,7 +139,7 @@ async def list_uploads():
     }
 
 @app.get("/list_trash")
-async def list_trash():
+async def list_trash(current_user: str = Depends(get_current_user)):
     files = os.listdir("/home/ameya/cloudbox/trash")
     length = len(files)
 
