@@ -9,7 +9,7 @@ with importnb.Notebook():
     import api_handlers
 
 
-if api_handlers.check_user_exists():
+if not api_handlers.check_user_exists():
     if not api_handlers.register_user():
         sys.exit(1)
 else:

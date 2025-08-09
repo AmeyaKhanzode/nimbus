@@ -48,6 +48,7 @@ class User(BaseModel):
 
 @app.post("/register")
 async def register_user(user: User):
+    print(user.username)
     try:
         with open("user_data.json", "w") as f:
             json.dump(
@@ -56,7 +57,8 @@ async def register_user(user: User):
                     "password" : pwd_context.hash(user.password)
                 }, f)
         return {"status" : "success", "message" : f"User {user.username} registered successfully"}
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=400, detail="Could not register user")
 
 
