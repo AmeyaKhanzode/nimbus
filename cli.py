@@ -19,12 +19,12 @@ elif user_exists[0]:
 else:
     sys.exit(1)
 parser = argparse.ArgumentParser(description="CLI tool for a private cloud on my raspberry pi")
-parser.add_argument("commands", choices=["upload", "download", "list", "restore"])
+parser.add_argument("commands", choices=["upload", "download", "list", "restore", "delete"])
 parser.add_argument("filenames", nargs="*")
 
 args = parser.parse_args()
 
-if args.commands in ["upload", "download"] and not args.filenames:
+if args.commands in ["upload", "download", "delete", "restore"] and not args.filenames:
     print(f"Error: '{args.commands}' command requires at least one filename.")
     sys.exit(1)
 
@@ -40,6 +40,7 @@ match args.commands:
         api_handlers.list_files()
     case "delete":
         for filename in args.filenames:
+            print("level 1 deep")
             api_handlers.handle_delete(filename)
     case "restore":
         for filename in args.filenames:

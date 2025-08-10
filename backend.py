@@ -155,7 +155,7 @@ async def list_trash(current_user: str = Depends(get_current_user)):
 @app.delete("/delete")
 async def move_to_trash(filename: str, current_user = Depends(get_current_user)):
     trash_path = f"/home/ameya/cloudbox/trash/{filename}"
-    file_path = f"/home/ameya/cloudbox/{filename}"
+    file_path = f"/home/ameya/cloudbox/uploads/{filename}"
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail = "file not found")
@@ -168,7 +168,7 @@ async def move_to_trash(filename: str, current_user = Depends(get_current_user))
 @app.post("/restore")
 async def restore_file(filename: str, current_user = Depends(get_current_user)):
     file_path = f"/home/ameya/cloudbox/trash/{filename}"
-    restore_path = f"/home/ameya/cloudbox/{filename}"
+    restore_path = f"/home/ameya/cloudbox/uploads/{filename}"
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail = "file not found")
@@ -180,7 +180,7 @@ async def restore_file(filename: str, current_user = Depends(get_current_user)):
 
 @app.post("/hard_delete")
 async def restore_file(filename: str, current_user = Depends(get_current_user)):
-    file_path = f"/home/ameya/cloudbox/{filename}"
+    file_path = f"/home/ameya/cloudbox/trash/{filename}"
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail = "file not found")
