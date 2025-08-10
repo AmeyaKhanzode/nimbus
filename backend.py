@@ -97,6 +97,8 @@ async def user_exists():
 # Create uploads directory on startup
 UPLOADS_DIR = "/home/ameya/cloudbox/uploads"
 os.makedirs(UPLOADS_DIR, exist_ok=True)
+TRASH_DIR = "/home/ameya/cloudbox/trash"
+os.makedirs(TRASH_DIR, exist_ok=True)
 
 @app.post("/upload")
 async def upload_files(file: UploadFile = File(...), current_user: str = Depends(get_current_user)):
