@@ -9,6 +9,7 @@ from jose import jwt, JWTError, ExpiredSignatureError
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 import json
+import shutil
 
 SECRET_KEY = os.getenv("SECRET_KEY", secrets.token_hex(32))
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")  # used to securely hash passwords
@@ -150,3 +151,41 @@ async def list_trash(current_user: str = Depends(get_current_user)):
         "count" : length,
         "message" : f"Found {length} files in the trash"
     }
+
+@app.delete("/delete")
+async def move_to_trash(filename: str, current_user = Depends(get_current_user)):
+    trash_path = f"/home/ameya/cloudbox/trash/{filename}"
+    file_path = f"/home/ameya/cloudbox/{filename}"
+
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail = "file not found")
+    try:
+        shutil.move(file_path, trash_path)
+        return {"status": "success", "message": "File moved to trash"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/restore")
+async def restore_file(filename: str, current_user = Depends(get_current_user)):
+    file_path = f"/home/ameya/cloudbox/trash/{filename}"
+    restore_path = f"/home/ameya/cloudbox/{filename}"
+
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail = "file not found")
+    try:
+        shutil.move(file_path, restore_path)
+        return {"status": "success", "message": "File restored"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/hard_delete")
+async def restore_file(filename: str, current_user = Depends(get_current_user)):
+    file_path = f"/home/ameya/cloudbox/{filename}"
+
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail = "file not found")
+    try:
+        os.remove(file_path)
+        return {"status": "success", "message": "File deleted permenantly"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
