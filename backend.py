@@ -10,8 +10,23 @@ from pydantic import BaseModel
 from datetime import datetime, timedelta
 import json
 import shutil
+from cryptography.fernet import Fernet
 
 SECRET_KEY = os.getenv("SECRET_KEY", secrets.token_hex(32))
+
+KEY_FILE = "encryption.key"
+
+if os.path.exists(KEY_FILE):
+    with open(KEY_FILE, "rb") as f:
+        f.read()
+else:
+    key = Fernet.generate_key()
+    with open(KEY_FILE, "wb") as f:
+        f.write(key)
+
+ENCRYPTION_KEY = key
+fernet = Fernet(ENCRYPTION_KEY)
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")  # used to securely hash passwords
 
 def verify_password(plain_password, hashed_password):

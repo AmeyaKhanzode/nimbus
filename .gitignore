@@ -3,3 +3,4 @@ static
 *.pdf
 cloudbox_downloads
 .DS
+*.key
