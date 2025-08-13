@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 
-from importnb import Notebook
 import os
 import requests
 import getpass
 import json
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
-
-with Notebook():
-    import db_utils
+import db_utils
 
 db_utils.init_db()
 token_path = os.path.expanduser("~/Library/Application Support/myapp/")

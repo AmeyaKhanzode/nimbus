@@ -5,8 +5,7 @@ import importnb
 import os
 import sys
 
-with importnb.Notebook():
-    import api_handlers
+import api_handlers
 
 user_exists = api_handlers.check_user_exists()
 
